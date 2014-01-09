@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Selenium & Ruby</title>
+
+		<meta name="description" content="Selenium Talk for Geneva.rb">
+		<meta name="author" content="Thibault Béné">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+					<h1>Selenium & Ruby</h1>
+					<h3>The basics</h3>
+					<p>
+						<small>Talk by <a href="http://thibaultbene.fr">Thibault Béné</a> / <a href="http://twitter.com/twib0">@twib0</a></small>
+					</p>
+				</section>
+
+				<section>
+					<section>
+						<h2>What is Selenium ?</h2>
+						<p class="fragment air">It's a tool to build automatic tests for your website</p>
+							<p class="fragment air">But tests at the browser level</p>
+							<p class="fragment air roll-in">To be closer to the real user experience</p>
+							<p class="fragment air roll-in">Exercises your JavaScript</p>
+							<p class="fragment air roll-in">You can even tests your site in any browser (including Android and iOS!)</p>
+							<a href="#" class="fragment roll-in image navigate-down">
+								<img width="59" height="79" src="images/arrow.png" alt="Down arrow">
+							</a>
+					</section>
+					<section>
+						<h2>Selenium’s Tool Suite</h2>
+						<p class="air">Selenium is composed of multiple software tools. Each has a specific role.</p>
+						<ol>
+
+							<li class="fragment roll-in">Selenium 1 (aka. Selenium RC or Remote Control)
+							<ul>
+								<li class="fragment roll-in yellow"><span class="white">Was the main selenium project, still supported.</span></li>
+							</ul>
+							</li>
+
+							<li class="fragment roll-in">Selenium 2 (aka. Selenium Webdriver)</li>
+							<ul>
+								<li class="fragment roll-in yellow"><span class="white">It's a new version including a more cohesive and object oriented API.</span></li>
+							</ul>
+							</li>
+
+							<li class="fragment roll-in">Selenium IDE</li>
+							<ul>
+								<li class="fragment roll-in yellow"><span class="white">Firefox plugin with UI.Only intended as a prototyping tool.</span></li>
+							</ul>
+							</li>
+
+							<li class="fragment roll-in">Selenium-Grid</li>
+							<ul>
+								<li class="fragment roll-in yellow"><span class="white">Part of the Webdriver, used to scale for large test suites and for test suites in multiple environments.</span></li>
+							</ul>
+							</li>
+
+						</ol>
+
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Quick Selenium IDE Overview</h2>
+						<p class="air">Just to show you quickly what that can do.</p>
+						<a href="#" class="image navigate-down">
+							<img width="178" height="238" src="images/arrow.png" alt="Down arrow">
+						</a>
+					</section>
+					<section>
+						<h2>With basic code for basic actions</h2>
+						<a class="test">
+							<img width="724" height="589" src="images/ide.png" alt="ide_demo">
+						</a>
+					</section>
+					<section>
+						<h2>Cool?</h2>
+						<p class="air">It's easy, non-coders can easily create tests.</p>
+						<p class="air" >That record your actions in the browser.</p>
+						<p class="air">And replay them.</p>
+					</section>
+					<section>
+						<h2>BUT !</h2>
+						<p class="fragment air roll-in">Tests are unreliable.</p>
+						<p class="fragment air roll-in">It's using a built-in langage. Eurk.</p>
+						<p class="fragment air roll-in">You have to use built-in methods, you can't create your own. Eurk!</p>
+						<p class="fragment air roll-in">You don't have any access with the db, you have to create all objects you need. Eurk!!</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Selenium Ruby Webdriver</h2>
+						<p class="air">Selenium is pretty easy to configure for a RoR App.</p>
+						<p class="air">You just need to add the gem into your gemfile</p>
+						<pre><code contenteditable>
+group :selenium do
+  gem 'selenium-webdriver', '2.30.0'
+end
+						</code></pre>
+						<p class="air">Create a helper to setup all your preferences, and setup a Selenium DB</p>
+						<pre><code contenteditable>
+def driver
+  @driver ||= Selenium::WebDriver.for :firefox, :profile => set_profile
+end
+
+def wait
+  @wait ||= Selenium::WebDriver::Wait.new(:timeout => 10)
+end
+						</code></pre>
+						<p>You are done ! Then let's code !</p>
+						<a href="#" class="image navigate-down">
+								<img width="59" height="79" src="images/arrow.png" alt="Down arrow">
+							</a>
+	
+					</section>
+	
+					<section>
+						<h2>Using Factories</h2>
+						<p class="air">I'm able to create all the objects I need directly to the DB</p>
+						<i>Example : Creating a track, and all the objects that a track need to exists</i>
+						<pre><code contenteditable>
+factory :track do
+  association :project
+  artist 'Chab'
+  title 'Foo'
+  deleted_at nil
+  uploaded_file { File.new('test/fixtures/mp3s/sample.mp3') }
+  nature { Track::Natures::ORIGINAL }
+  isrc nil
+  after(:build)  { |t| t.uploaded_file.stubs(:original_filename => 'uploaded_original_filename') }
+ end
+						</code></pre>
+					</section>
+
+				<section>
+					<h2>To build robust tests</h2>
+					<p class="air">With this track factory I'm able to create a test without creating a user, a project ...</p>
+					<pre><code contenteditable>
+def test_password_protection
+  track = FactoryGirl.create(:track)
+  track_picture_url_medium  =  'http:' + track.picture.url(size = 'medium')
+  track_pwd = '123456'
+  login(track.project.creator)
+  click_on_edit
+  switch_to_restricted_with_password(track_pwd)
+  click_on_promopages
+  check_password_protected_page(track_pwd, track, track_picture_url_medium)
+  cant_click_player_share_panel_button
+end
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Cool?</h2>
+					<p class="air">It's easy to write, with your own methods.</p>
+					<p class="air">In case of errors, you can debug easily using the backtrace or even logs.</p>
+					<p class="air">You can handle high level event, such as drag and drop, ajax requests ...</p>
+				</section>
+
+				<section>
+					<h2>Even Cooler !</h2>
+					<p class="air">You can integrate test suites with Jenkins or Travis.</p>
+					<p class="air">You can setup as many drivers you want to test multiple browsers.</p>
+				</section>
+
+				<section>
+					<h2>BUT !</h2>
+					<p class="air">Be careful, selenium is a high consumer of computer resources, and his performances are linked to your hardware.</p>
+					<p class="air">Always make Selenium waits for elements to load before running a task on them.</p>
+					<p class="air">As selenium is testing complex scenarios, running the whole test suite can be long.</p>
+				</section>
+
+			</section>
+
+			<section>
+				<h1>CONCLUSION</h1>
+					<p class="air"></p>
+					<p class="air">Selenium is a great tool that integrates well as the final step of a development workflow. </p>
+					<p class="air">Tests are very focused on specific user interactions so that when a test fails, some aspect of the user experience is broken.</p>
+					<p class="air">With the Selenium backtrace, a developer console and some QA magic, we can quickly find the source of the bug and fix it before the feature goes live.</p>
+			</section>
+
+			<section>
+				<h1>THE END</h1>
+				<h3>Talk by <a href="http://thibaultbene.fr">Thibault Béné</a> / <a href="http://twitter.com/twib0">@twib0</a></h3>
+			</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+		<!-- GA -->
+		<script>
+  		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+  		ga('create', 'UA-41432674-2', 'thibaultbene.fr');
+  		ga('send', 'pageview');
+
+		</script>
+
+	</body>
+</html>
